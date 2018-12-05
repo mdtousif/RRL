@@ -1,0 +1,64 @@
+import com.ril.digital.facades.cms.dto.*;
+import com.ril.digital.facades.product.data.MediaData;
+import de.hybris.platform.acceleratorcms.data.CmsPageRequestContextData;
+import de.hybris.platform.acceleratorcms.model.components.CMSTabParagraphComponentModel;
+import de.hybris.platform.acceleratorcms.model.components.CMSTabParagraphContainerModel;
+import de.hybris.platform.acceleratorcms.model.components.NavigationComponentModel;
+import de.hybris.platform.catalog.CatalogVersionService;
+import de.hybris.platform.catalog.enums.ProductReferenceTypeEnum;
+import de.hybris.platform.catalog.model.CatalogVersionModel;
+import de.hybris.platform.category.model.CategoryModel;
+import de.hybris.platform.cms2.enums.LinkTargets;
+import de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel;
+import de.hybris.platform.cms2.model.contents.components.CMSLinkComponentModel;
+import de.hybris.platform.cms2.model.contents.components.CMSParagraphComponentModel;
+import de.hybris.platform.cms2.model.contents.components.SimpleCMSComponentModel;
+import de.hybris.platform.cms2.model.contents.contentslot.ContentSlotModel;
+import de.hybris.platform.cms2.model.navigation.CMSNavigationEntryModel;
+import de.hybris.platform.cms2.model.navigation.CMSNavigationNodeModel;
+import de.hybris.platform.cms2.model.pages.AbstractPageModel;
+import de.hybris.platform.cms2.model.relations.ContentSlotForPageModel;
+import de.hybris.platform.cms2.model.restrictions.AbstractRestrictionModel;
+import de.hybris.platform.cms2.servicelayer.data.RestrictionData;
+import de.hybris.platform.cms2.servicelayer.services.CMSRestrictionService;
+import de.hybris.platform.cms2lib.model.components.AbstractBannerComponentModel;
+import de.hybris.platform.cms2lib.model.components.BannerComponentModel;
+import de.hybris.platform.cms2lib.model.components.ProductCarouselComponentModel;
+import de.hybris.platform.cms2lib.model.components.RotatingImagesComponentModel;
+import de.hybris.platform.commercefacades.product.ProductFacade;
+import de.hybris.platform.commercefacades.product.ProductOption;
+import de.hybris.platform.commercefacades.product.data.*;
+import de.hybris.platform.commerceservices.category.CommerceCategoryService;
+import de.hybris.platform.commerceservices.url.UrlResolver;
+import de.hybris.platform.core.model.ItemModel;
+import de.hybris.platform.core.model.media.MediaModel;
+import de.hybris.platform.core.model.product.ProductModel;
+import de.hybris.platform.product.ProductService;
+
+CatalogVersionService catalogVersionService = spring.getBean(CatalogVersionService.class);
+ProductService productService = spring.getBean(ProductService.class);
+CatalogVersionModel onlineCatalog = catalogVersionService.getCatalogVersion("rrlDigitalProductCatalog", "Online");
+ProductModel productModel = productService.getProductForCode(onlineCatalog, "491182742");
+final List extraOptions = Arrays.asList(ProductOption.VARIANT_MATRIX_BASE,
+ProductOption.VARIANT_MATRIX_URL, ProductOption.VARIANT_MATRIX_MEDIA);
+final List options = new ArrayList<>(Arrays.asList(ProductOption.VARIANT_FIRST_VARIANT,
+ProductOption.BASIC, ProductOption.URL, ProductOption.PRICE, ProductOption.SUMMARY,
+ProductOption.DESCRIPTION, ProductOption.GALLERY, ProductOption.CATEGORIES, ProductOption.REVIEW,
+ProductOption.PROMOTIONS, ProductOption.CLASSIFICATION, ProductOption.VARIANT_FULL,
+ProductOption.STOCK, ProductOption.VOLUME_PRICES, ProductOption.PRICE_RANGE,
+ProductOption.DELIVERY_MODE_AVAILABILITY, ProductOption.REFERENCES));
+options.addAll(extraOptions);
+ProductData productData2 = productFacade.getProductForOptions(productModel, options);
+
+List productReferences = productData2.getProductReferences();
+
+for (ProductReferenceData productReferenceData : productReferences)
+{
+ProductData childProduct = productReferenceData.getTarget();
+System.out.println(childProduct.getCode());
+for (ImageData data : childProduct.getImages())
+{
+System.out.println(data.getUrl());
+System.out.println(data.getFormat());
+}
+}
