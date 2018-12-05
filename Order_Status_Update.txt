@@ -1,0 +1,33 @@
+import java.lang.String;
+import de.hybris.platform.servicelayer.search.FlexibleSearchQuery;
+import de.hybris.platform.core.enums.OrderStatus;
+import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.OrderModel;
+import de.hybris.platform.servicelayer.model.ModelService;
+import de.hybris.platform.servicelayer.search.SearchResult;
+import de.hybris.platform.servicelayer.search.FlexibleSearchService;
+import com.ril.digital.core.enums.OrderEntryStatusEnum;
+
+
+
+FlexibleSearchService flexibleSearchService = spring.getBean("flexibleSearchService");
+ModelService modelService = spring.getBean("modelService");
+
+
+String queryString="Select {o.pk} from {Order as o JOIN PaymentMode as pm ON " +
+                    "{o.paymentMode}={pm.pk} JOIN OrderStatus as os ON {os.pk}={o.status}} WHERE {pm.code} " +
+                    "IN ('CREDIT_CARD','DEBIT_CARD','NETS','WALLET','EMI') AND {os.code}='PENDING_PAYMENT'";
+            final FlexibleSearchQuery query = new FlexibleSearchQuery(queryString);
+			SearchResult<OrderModel> result = flexibleSearchService.search(query);
+			List<OrderModel> orders=result.getResult();
+for(OrderModel orderModel: orders){
+  out.println orderModel.getCode() 
+  out.println orderModel.getStatus()
+   orderModel.setStatus(OrderStatus.TRANSACTION_FAILURE);
+  modelService.save(orderModel);
+
+   for (AbstractOrderEntryModel abstractOrderEntryModel : orderModel.getEntries()) {
+                                    abstractOrderEntryModel.setEntryStatus(OrderEntryStatusEnum.PAYMENT_UNSUCCESSFUL);
+                                    modelService.save(abstractOrderEntryModel);
+              }
+}
